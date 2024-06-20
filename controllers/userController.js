@@ -28,7 +28,8 @@ const Register = async (req, res) => {
             password: hashedPassword
         });
         return res.status(201).json({
-            message: "Account created successfully !"
+            message: "Account created successfully !",
+            success: true
         });
     } catch (error) {
         console.log(error);
@@ -48,7 +49,7 @@ const Login = async (req, res) => {
         const user = await userModel.findOne({ email });
         if (!user) {
             return res.status(401).json({
-                message: "Invalid email or password",
+                message: "Invalid email or password so please create your account",
                 success: false
             });
         }
@@ -72,6 +73,7 @@ const Login = async (req, res) => {
             .cookie("token", token, { httpOnly: true })
             .json({
                 message: `Welcome back ${user.fullName}`,
+                user,
                 success: true
             });
 
@@ -80,10 +82,20 @@ const Login = async (req, res) => {
     }
 }
 
+const Logout = async(req, res) => {
+    return res.status(200)
+    .cookie("token", "", {expiresIn : new Date(Date.now()), httpOnly : true})
+    .json({
+        success : true,
+        message : "User Logged Out Successfully !"
+    });
+}
+
 
 const userContainer = {
     Register,
     Login,
+    Logout
 }
 
 module.exports = userContainer;
